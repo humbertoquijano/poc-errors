@@ -3,12 +3,18 @@ package main
 import (
 	"log"
 	"os"
+	"runtime"
 	"strconv"
+	"sync"
 
 	looptry "mti.com/poc-errors/loop-try"
 )
 
 func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
+	var wg sync.WaitGroup
+
 	miArg := os.Args[1]
 
 	miVal, err := strconv.Atoi(miArg)
@@ -21,9 +27,13 @@ func main() {
 		log.Fatal("valor de argumento no válido")
 	}
 
-	for i := 0; i < miVal; i++ {
-		looptry.TestLoop(i)
+	miVal++
+	for i := 1; i < miVal; i++ {
+		wg.Add(1)
+		go looptry.TestLoop(i, &wg)
 	}
+
+	wg.Wait()
 
 	log.Println("test OK")
 }
