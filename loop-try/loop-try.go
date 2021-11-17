@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -26,9 +27,13 @@ func TestLoop(ciclos int, wg *sync.WaitGroup) {
 
 	scanner := bufio.NewScanner(resp.Body)
 
+	var sb strings.Builder
+
 	for i := 0; scanner.Scan(); i++ {
-		log.Println(scanner.Text())
+		sb.WriteString(scanner.Text())
 	}
+
+	log.Println(sb.String())
 
 	if ciclos > 7 {
 		log.Panic("limite excedido")
